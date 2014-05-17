@@ -35,7 +35,17 @@ if giorno == 'sabato' or giorno == 'domenica':
 cursor.execute("SELECT * FROM %s WHERE aula = 'G2C'" % (giorno)) 
 corsi = cursor.fetchall()
 
-print "Lezioni giornaliere: \n", corsi
+print "Informazioni Aula G2C \nLezioni giornaliere: \n"
+
+for i in corsi:    
+    corso = i[0]
+    macro = i[1]
+    orario = i[2]
+    aula = i[3]
+    fine = i[4]
+    print corso, "(", orario, "-", fine, ")"
+
+print  "\n ===================== \n"
 
 
 #Lettura temperatura esterna tramite OpenWeatherMap API
@@ -54,18 +64,20 @@ statust = "Ok"
 
 def checktemp():
 
-    if int(data[1:3]) in range(21,26):
+    if int(data[0:2]) in range(21,26):
         #Temperatura ok, non invio nulla
         statust = "Ok"
 
-    elif int(data[1:3]) < 20:
+    elif int(data[0:2]) < 20:
         #Alert freddo
-        twyapi.update_status(status="Nell'aula G2C la temperatura e' scesa")
+        tweet = "Nell'aula G2C la temperatura e' scesa (Timestamp update:" + ts + ")"
+        twyapi.update_status(status=tweet)
         statust = "Freddo"
 
-    elif int(data[1:3]) > 26:
+    elif int(data[0:2]) > 26:
         #Alert caldo
-        twyapi.update_status(status="Nell'aula G2C la temperatura e' troppo alta")
+        tweet = "Nell'aula G2C la temperatura e' troppo alta (Timestamp update:" + ts + ")"
+        twyapi.update_status(status=tweet)
         statust = "Caldo"
 
 #Check luce
@@ -74,16 +86,18 @@ statusl = "Ok"
 
 def checkluce():
 
-    if int(data[4:7]) in range(400, 700):
+    if int(data[3:7]) in range(400, 700):
         #Luce ok, non invio nulla
         statusl = "Ok"
-    elif int(data[4:7]) < 400:
+    elif int(data[3:7]) < 400:
         #Alert bassa luce
-        twyapi.update_status(status="Nell'aula G2C c'e' poca luce")
+        tweet = "Nell'aula G2C c'e' poca luce (Timestamp update:" + ts + ")"
+        twyapi.update_status(status=tweet)
         statusl = "Meno del normale"
-    elif int(data[4:7]) > 700:
+    elif int(data[3:7]) > 700:
         #Sensore in prossimita' di una luce
-        twyapi.update_status(status="Nell'aula G2C il sensore e' mal posizionato")
+        tweet = "Nell'aula G2C il sensore e' mal posizionato (Timestamp update:" + ts + ")"
+        twyapi.update_status(status=tweet)
         statusl = "Sensore mal posizionato"
 
 countp = 0
@@ -100,7 +114,7 @@ else:
     if 2 * countp > 60:
         twyapi.update_status(status="L'aula G2C si sta riempiendo")
 
-print "Informazioni Aula G2C \n Stato temperatura: %s \n Illuminazione: %s \n" % (statust, statusl)
+print "Stato temperatura: %s" % (statust), "(",data[0:2],"C)", "\nIlluminazione: %s \n" % (statusl)
 
 
 #Setto un intervallo di 10 minuti tra ogni call
