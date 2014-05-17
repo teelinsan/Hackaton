@@ -70,7 +70,6 @@ data = ser.readline() #Leggo il serial fino al primo /n
 
 
 def checktemp():
-    
     statust = "Ok"
 
     if int(data[0:2]) in range(21,26):
@@ -79,15 +78,14 @@ def checktemp():
 
     elif int(data[0:2]) < 20:
         #Alert freddo
-        tweet = "Nell'aula G2C la temperatura e' scesa (Timestamp update:" + ts + ")"
-        twyapi.update_status(status=tweet)
+
         statust = "Freddo"
 
     elif int(data[0:2]) > 26:
         #Alert caldo
-        tweet = "Nell'aula G2C la temperatura e' troppo alta (Timestamp update:" + ts + ")"
-        twyapi.update_status(status=tweet)
+
         statust = "Caldo"
+    return statust
 
 statust = checktemp()
 
@@ -95,22 +93,18 @@ statust = checktemp()
 
 
 def checkluce():
-
     statusl = "Ok"
-
-    if int(data[3:7]) in range(400, 700):
+    if int(data[2:6]) in range(400, 600):
         #Luce ok, non invio nulla
         statusl = "Ok"
-    elif int(data[3:7]) < 400:
+    elif int(data[2:6]) < 400:
         #Alert bassa luce
-        tweet = "Nell'aula G2C c'e' poca luce (Timestamp update:" + ts + ")"
-        twyapi.update_status(status=tweet)
         statusl = "Meno del normale"
-    elif int(data[3:7]) > 700:
+        #Alza serrande
+    elif int(data[2:6]) > 600:
         #Sensore in prossimita' di una luce
-        tweet = "Nell'aula G2C il sensore e' mal posizionato (Timestamp update:" + ts + ")"
-        twyapi.update_status(status=tweet)
         statusl = "Sensore mal posizionato"
+    return statusl
 
 statusl = checkluce()
 
@@ -136,7 +130,7 @@ while True:
     checktemp()
     print "Stato temperatura: %s" % (statust), "(",data[0:2],"C)", "\nIlluminazione: %s \n" % (statusl)
     print "Ultimo update", datetime.datetime.now().strftime("%H:%M:%S")
-    time.sleep(5)
+    time.sleep(600) #Misuro ogni 10 minuti
     os.system('cls')
 
 db.close()
