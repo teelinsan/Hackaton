@@ -22,7 +22,7 @@ twyapi = Twython(CONSUMER_KEY,CONSUMER_SECRET,ACCESS_KEY,ACCESS_SECRET)
 db = MySQLdb.connect(host="localhost", user="root", passwd="root", db="hackaton")
 cursor = db.cursor()
 
-#Info sull'aula
+#Infos
 
 giornilist = ['lunedi', 'martedi', 'mercoledi', 'giovedi', 'venerdi', 'sabato', 'domenica']
 giorno = giornilist[datetime.date.today().weekday()]
@@ -31,7 +31,8 @@ if giorno == 'sabato' or giorno == 'domenica':
     print "E' il weekend, non ci sono lezioni!"
     sys.exit()
 
-
+#Chiamo tutti gli eventi legati all'aula dal database
+    
 cursor.execute("SELECT * FROM %s WHERE aula = 'G2C'" % (giorno)) 
 corsi = cursor.fetchall()
 
