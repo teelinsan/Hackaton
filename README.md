@@ -4,9 +4,9 @@ Hackaton
 Progetto per il #TorVergataHackaton. 
 
 Requisiti hardware:
-- Arduino Yun
-- Sensore di temperatura
-- Sensore di luminosità
+Arduino Yun
+Sensore di temperatura
+Sensore di luminosità
 
 Per questo progetto abbiamo usato un TinkerKit, gli sketch Arduino sono basati su quella lib. 
 
