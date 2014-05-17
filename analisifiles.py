@@ -1,4 +1,4 @@
-import serial, json, MySQLdb, datetime, time, sys
+import serial, json, MySQLdb, datetime, time, sys, os
 from urllib2 import urlopen
 from json import load
 from twython import Twython
@@ -47,7 +47,7 @@ for i in corsi:
 
 print  "\n ===================== \n"
 
-
+'''
 #Lettura temperatura esterna tramite OpenWeatherMap API
 
 meteor = urlopen('http://api.openweathermap.org/data/2.5/weather?id=4219762')
@@ -55,14 +55,23 @@ meteo = load(meteor)
 temp = int((meteo['main']['temp_max'] + meteo['main']['temp_min'])/2 - 273.15) #Media max e min + conversione in C + float to int
 umidita = meteo['main']['humidity']
 
+if temp > 25:
+    #Spengi termosifoni
+elif temp < 15:
+    #Accendi termosifoni
+else:
+    pass
+'''
+
 ser = serial.Serial('COM4', 9600) #Apro connessione Arduino
 data = ser.readline() #Leggo il serial fino al primo /n
 
 #Check temperatura
 
-statust = "Ok"
 
 def checktemp():
+    
+    statust = "Ok"
 
     if int(data[0:2]) in range(21,26):
         #Temperatura ok, non invio nulla
@@ -80,11 +89,14 @@ def checktemp():
         twyapi.update_status(status=tweet)
         statust = "Caldo"
 
+statust = checktemp()
+
 #Check luce
 
-statusl = "Ok"
 
 def checkluce():
+
+    statusl = "Ok"
 
     if int(data[3:7]) in range(400, 700):
         #Luce ok, non invio nulla
@@ -100,28 +112,31 @@ def checkluce():
         twyapi.update_status(status=tweet)
         statusl = "Sensore mal posizionato"
 
-countp = 0
+statusl = checkluce()
 
-def checkpass(): #Vedo quanti 
-    if int(data[0]) == 1:
-        countp += 1
-    
+tweet = "Lezione: Hackaton | Temperatura: %s C | Illuminazione: %s | " % (data[0:2], statusl) + ts
+twyapi.update_status(status=tweet)
 
-start = time.time()
-if time.time() < start + 300:
-    checkpass()
-else:
-    if 2 * countp > 60:
-        twyapi.update_status(status="L'aula G2C si sta riempiendo")
-
-print "Stato temperatura: %s" % (statust), "(",data[0:2],"C)", "\nIlluminazione: %s \n" % (statusl)
-
-
-#Setto un intervallo di 10 minuti tra ogni call
+#Setto un intervallo di n minuti tra ogni call
+#Le informazioni in questo modo sono aggiornate di continuo
 
 while True:
+    print "Informazioni Aula G2C \n\nLezioni giornaliere: \n"
+
+    for i in corsi:    
+        corso = i[0]
+        macro = i[1]
+        orario = i[2]
+        aula = i[3]
+        fine = i[4]
+        print corso, "(", orario, "-", fine, ")"
+
+    print  "\n ===================== \n"
     checkluce()
     checktemp()
-    time.sleep(600)
+    print "Stato temperatura: %s" % (statust), "(",data[0:2],"C)", "\nIlluminazione: %s \n" % (statusl)
+    print "Ultimo update", datetime.datetime.now().strftime("%H:%M:%S")
+    time.sleep(5)
+    os.system('cls')
 
 db.close()

@@ -30,10 +30,13 @@ def corsiora(): #Lista delle lezioni in corso in questo momento
         macro = i[1]
         orario = i[2]
         aula = i[3]
-        durata = i[4]
-        fine = orario + durata
-        if orario < ora < orario + durata:
+        fine = i[4]
+        if str(orario).join(":") < str(ora).join(":") < str(fine).join(":"):
             print "In aula %s c'e' un corso di %s fino alle %s" % (aula, corso, fine)
+        else: 
+            print "Non ci sono corsi in aula %s" % (aula)
+
+    return True
 
 def aulelibere(): #Lista delle aule libere
     print "Le aule libere sono: \n"
@@ -43,14 +46,18 @@ def aulelibere(): #Lista delle aule libere
         orario = i[2]
         aula = i[3]
         fine = i[4]
-        if not orario < ora < orario + durata:
+        if not str(orario).join(":") < str(ora).join(":") < str(fine).join(":"):
             print aula, "\n"
+        else:
+            print "L'aula %s e' occupata" % (aula)
+    return True
     
 
 ask = raw_input("Cosa vuoi sapere? (Inserisci il numero e premi invio) \n 1. Quali lezioni sono in corso \n 2. Le aule libere\n")
 if ask == "1":
-    print corsiora()
+    corsiora()
 elif ask == "2":
-    print aulelibere()
+    aulelibere()
 
 db.close()
+raw_input()
